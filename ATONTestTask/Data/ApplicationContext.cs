@@ -13,15 +13,7 @@ namespace ATONTestTask.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            var defaultUser = new User() 
-            { 
-                Id = Guid.NewGuid(),  
-                Login = "Admin",
-                PasswordHash = "",
-                Admin = true,
-                Name = "Admin",
-            };
-            modelBuilder.Entity<User>().HasData(defaultUser);
+            modelBuilder.Entity<User>().HasIndex(u => u.Login).IsUnique();
         }
     }
 }
