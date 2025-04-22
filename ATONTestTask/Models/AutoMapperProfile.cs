@@ -1,4 +1,6 @@
-﻿using ATONTestTask.Data.Entites;
+﻿using ATONTestTask.Abstractions;
+using ATONTestTask.Data.Entites;
+using ATONTestTask.ViewModels.Request;
 using ATONTestTask.ViewModels.Resposne;
 using AutoMapper;
 
@@ -10,6 +12,8 @@ namespace ATONTestTask.Models
         {
             CreateMap<User, UserDto>();
             CreateMap<User, UserExtendedDto>();
+
+            CreateMap<CreateUsereDto, User>();
         }
     }
 }

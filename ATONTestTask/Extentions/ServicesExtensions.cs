@@ -30,6 +30,7 @@ namespace ATONTestTask.Extentions
             builder.Services.AddControllersWithViews().AddNewtonsoftJson(options =>
             {
                 options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
             });
             return builder;
         }
@@ -113,6 +114,7 @@ namespace ATONTestTask.Extentions
 
         public static WebApplicationBuilder AddAppServices(this WebApplicationBuilder builder)
         {
+            builder.Services.AddHttpContextAccessor();
             builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IUsersService, UsersService>();

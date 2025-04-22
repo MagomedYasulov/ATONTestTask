@@ -12,8 +12,8 @@ namespace ATONTestTask.Data.Entites
         public bool Admin { get; set; }
 
         public string CreatedBy { get; set; } = string.Empty;
-        public DateTime ModifiedOn { get; set; }
-        public string ModifiedBy { get; set; } = string.Empty;
+        public DateTime? ModifiedOn { get; set; }
+        public string? ModifiedBy { get; set; }
         public DateTime? RevokedOn { get; set; }
         public string? RevokedBy { get; set; }
     }
