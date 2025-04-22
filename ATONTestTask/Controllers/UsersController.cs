@@ -40,41 +40,41 @@ namespace ATONTestTask.Controllers
         }
 
         [Authorize(Roles = "Admin, User")]
-        [HttpPut("{id}")]
-        public async Task<ActionResult<UserDto>> Update(Guid id, UpdateUserDto model)
+        [HttpPut("{login}")]
+        public async Task<ActionResult<UserDto>> Update(string login, UpdateUserDto model)
         {
-            var userDto = await _usersService.Update(id ,model);
+            var userDto = await _usersService.Update(login, model);
             return Ok(userDto);
         }
 
         [Authorize(Roles = "Admin, User")]
-        [HttpPatch("{id}/password")]
-        public async Task<ActionResult<UserDto>> UpdatePassword(Guid id, [FromBody]string password)
+        [HttpPatch("{login}/password")]
+        public async Task<ActionResult<UserDto>> UpdatePassword(string login, [FromBody]string password)
         {
-            var userDto = await _usersService.UpdatePassword(id, password);
+            var userDto = await _usersService.UpdatePassword(login, password);
             return Ok(userDto);
         }
 
 
         [Authorize(Roles = "Admin, User")]
-        [HttpPatch("{id}/login")]
-        public async Task<ActionResult<UserDto>> UpdateLogin(Guid id, [FromBody] string login)
+        [HttpPatch("{login}/login")]
+        public async Task<ActionResult<UserDto>> UpdateLogin(string login, [FromBody] string newLogin)
         {
-            var userDto = await _usersService.UpdatePassword(id, login);
+            var userDto = await _usersService.UpdateLogin(login, newLogin);
             return Ok(userDto);
         }
 
-        [HttpPatch("{id}/recover")]
-        public async Task<ActionResult<UserDto>> UpdatePassword(Guid id)
+        [HttpPatch("{login}/recover")]
+        public async Task<ActionResult<UserExtendedDto>> RecoverUser(string login)
         {
-            var userDto = await _usersService.Recover(id);
+            var userDto = await _usersService.Recover(login);
             return Ok(userDto);
         }
 
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> Delete(Guid id, bool isSoft)
+        [HttpDelete("{login}")]
+        public async Task<ActionResult> Delete(string login, bool isSoft)
         {
-            await _usersService.Delete(id, isSoft);
+            await _usersService.Delete(login, isSoft);
             return Ok();
         }
     }

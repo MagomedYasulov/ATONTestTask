@@ -8,10 +8,10 @@ namespace ATONTestTask.Abstractions
         public Task<UserExtendedDto> Create(CreateUsereDto model);
         public Task<UserExtendedDto[]> Get(UsersFilter filter);
         public Task<UserExtendedDto> Get(string login);
-        public Task<UserDto> Update(Guid id, UpdateUserDto model);
-        public Task<UserDto> UpdateLogin(Guid id, string login);
-        public Task<UserDto> UpdatePassword(Guid id, string password);
-        public Task<UserExtendedDto> Recover(Guid id);
-        public Task Delete(Guid id, bool isSoft);
+        public Task<UserDto> Update(string login, UpdateUserDto model);
+        public Task<UserDto> UpdateLogin(string login, string newLogin);
+        public Task<UserDto> UpdatePassword(string login, string password);
+        public Task<UserExtendedDto> Recover(string login);
+        public Task Delete(string login, bool isSoft);
     }
 }
