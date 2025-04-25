@@ -66,25 +66,8 @@ namespace ATONTestTask.Services
                                                      (isRevokedOnNull || u.RevokedOn == null != filter.RevokedOn)
                                                      );
 
-            var users = await _dbContext.Users.AsNoTracking().Where(exp).ToArrayAsync();
+            var users = await _dbContext.Users.AsNoTracking().Where(exp).OrderBy(u => u.CreatedOn).ToArrayAsync();
             return _mapper.Map<UserExtendedDto[]>(users);
-        }
-
-        public async Task Delete(string login, bool isSoft)
-        {
-            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Login == login);
-            if (user == null)
-                throw new ServiceException("User Not Found", $"User with login {login} not found", StatusCodes.Status404NotFound);
-
-            if(isSoft)
-            {
-                user.RevokedBy = _httpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-                user.RevokedOn = DateTime.UtcNow;
-            }    
-            else
-                _dbContext.Remove(user);
-
-            await _dbContext.SaveChangesAsync();
         }
 
         public async Task<UserExtendedDto> Recover(string login)
@@ -102,11 +85,13 @@ namespace ATONTestTask.Services
 
         public async Task<UserDto> Update(string login, UpdateUserDto model)
         {
-            var user = await CheckPermissions(login);
+            var (user, updater) = await CheckPermissions(login);
 
             user.BirthDate = model.BirthDate;
             user.Name = model.Name;
             user.Gender = model.Gender!.Value;
+            user.ModifiedBy = updater;
+            user.ModifiedOn = DateTime.UtcNow;
             await _dbContext.SaveChangesAsync();
 
             return _mapper.Map<UserDto>(user);
@@ -114,11 +99,13 @@ namespace ATONTestTask.Services
 
         public async Task<UserDto> UpdateLogin(string oldLogin, string newLogin)
         {
-            var user = await CheckPermissions(oldLogin);
+            var (user, updater) = await CheckPermissions(oldLogin);
             if (await _dbContext.Users.AnyAsync(u => u.Login == newLogin))
                 throw new ServiceException("Users conflict", $"User with login {newLogin} already exist", StatusCodes.Status409Conflict);
 
             user.Login = newLogin;
+            user.ModifiedBy = updater;
+            user.ModifiedOn = DateTime.UtcNow;
             await _dbContext.SaveChangesAsync();
 
             return _mapper.Map<UserDto>(user);
@@ -126,14 +113,35 @@ namespace ATONTestTask.Services
 
         public async Task<UserDto> UpdatePassword(string login, string password)
         {
-            var user = await CheckPermissions(login);
+            var (user, updater) = await CheckPermissions(login);
+            
             user.PasswordHash = _passwordHasher.HashPassword(password);
+            user.ModifiedBy = updater;
+            user.ModifiedOn = DateTime.UtcNow;
             await _dbContext.SaveChangesAsync();
 
             return _mapper.Map<UserDto>(user);
         }
 
-        private async Task<User> CheckPermissions(string login)
+
+        public async Task Delete(string login, bool isSoft)
+        {
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Login == login);
+            if (user == null)
+                throw new ServiceException("User Not Found", $"User with login {login} not found", StatusCodes.Status404NotFound);
+
+            if (isSoft)
+            {
+                user.RevokedBy = _httpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+                user.RevokedOn = DateTime.UtcNow;
+            }
+            else
+                _dbContext.Remove(user);
+
+            await _dbContext.SaveChangesAsync();
+        }
+
+        private async Task<(User, string)> CheckPermissions(string login)
         {
             var updaterRole = _httpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.Role)!.Value;
             var updaterLogin = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
@@ -148,7 +156,7 @@ namespace ATONTestTask.Services
             if (updaterRole != "Admin" && user.RevokedOn != null)
                 throw new ServiceException("Access denied", $"Access to update user with login {login} denied", StatusCodes.Status403Forbidden);
 
-            return user;
+            return (user, updaterLogin);
         }
     }
 }

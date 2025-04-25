@@ -3,11 +3,6 @@ using ATONTestTask.Data;
 using ATONTestTask.Data.Entites;
 using ATONTestTask.Enums;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Tests
 {
@@ -18,10 +13,24 @@ namespace Tests
             dbContext.Database.EnsureDeleted();
             dbContext.Database.EnsureCreated();
 
-            var random = new Random();
-
-            var admin = new User() { Name = "admin", Admin = true, Login = "admin", PasswordHash = passwordHasher.HashPassword("admin") };
-            dbContext.Users.Add(admin);
+            var admin = new User()
+            {
+                Name = "admin",
+                Admin = true,
+                Login = "admin",
+                PasswordHash = passwordHasher.HashPassword("admin"),
+                CreatedOn = new DateTime(2002, 09, 29, 0,0,0, DateTimeKind.Utc)
+            };
+            var revokedUser = new User() 
+            { 
+                Name = "revoked_user_name", 
+                Login = "revoked_user", 
+                PasswordHash = passwordHasher.HashPassword("1234"), 
+                RevokedOn = DateTime.UtcNow, 
+                RevokedBy = "admin",
+                CreatedOn = new DateTime(2006, 10, 23, 0, 0, 0, DateTimeKind.Utc)
+            };
+            dbContext.Users.AddRange(admin, revokedUser);
 
             var users = new User[10];
             for (var i = 0; i < 10; i++)
@@ -33,6 +42,7 @@ namespace Tests
                     Admin = false,
                     PasswordHash = passwordHasher.HashPassword("user" + 1),
                     Gender = (Gender)(i % 2),
+                    CreatedOn = DateTime.UtcNow + TimeSpan.FromMinutes(i)
                 };
             }
             dbContext.Users.AddRange(users);

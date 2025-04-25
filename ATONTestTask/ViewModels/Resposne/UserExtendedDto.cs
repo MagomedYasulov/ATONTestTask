@@ -11,6 +11,7 @@ namespace ATONTestTask.ViewModels.Resposne
         public DateTime? BirthDate { get; set; }
         public bool Admin { get; set; }
 
+        public DateTime CreatedOn { get; set; }
         public string CreatedBy { get; set; } = string.Empty;
         public DateTime? ModifiedOn { get; set; }
         public string? ModifiedBy { get; set; }
