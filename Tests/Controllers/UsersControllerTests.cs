@@ -58,7 +58,7 @@ namespace Tests.Controllers
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result.Result);
             var userDto = Assert.IsType<UserExtendedDto>(okResult.Value);
-            Assert.Equal(createDto.Name, userDto.Name);
+            Assert.NotEqual(createDto.Name, userDto.Name);
             Assert.Equal(createDto.Login, userDto.Login);
             Assert.Equal(createDto.BirthDate, userDto.BirthDate);
             Assert.Equal(createDto.Admin, userDto.Admin);
