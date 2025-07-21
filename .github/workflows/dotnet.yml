@@ -16,6 +16,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    
+    - name: Show current directory
+      run: pwd   # Выведет путь к корню репозитория
+    
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
